@@ -1,0 +1,79 @@
+
+create database if not exists realtime_processing;
+use database realtime_processing;
+create schema if not exists scd2;
+use schema scd2;
+show tables;
+
+create or replace table customer (
+     customer_id number,
+     first_name varchar,
+     last_name varchar,
+     email varchar,
+     street varchar,
+     city varchar,
+     state varchar,
+     country varchar,
+     update_timestamp timestamp_ntz default current_timestamp());
+
+create or replace table customer_history (
+     customer_id number,
+     first_name varchar,
+     last_name varchar,
+     email varchar,
+     street varchar,
+     city varchar,
+     state varchar,
+     country varchar,
+     start_time timestamp_ntz default current_timestamp(),
+     end_time timestamp_ntz default current_timestamp(),
+     is_current boolean
+     );
+     
+create or replace table customer_raw (
+     customer_id number,
+     first_name varchar,
+     last_name varchar,
+     email varchar,
+     street varchar,
+     city varchar,
+     state varchar,
+     country varchar);
+
+
+
+create or replace stream customer_table_changes on table customer;
+
+
+
+
+// Creating external stage (create your own bucket)
+CREATE OR REPLACE STAGE Realtime_processing.SCD2.customer_ext_stage
+    url='s3://raviteja-dataprocessing/stream-data/'
+    credentials=(aws_key_id='AKIAXYKJS5OOOU6QAsdssdsKVB' aws_secret_key='Yrge9UqpNChx6yq9ycpdfdsfadsfasdfasdgnqPGMWwX97HgEdQ0HirR');
+   
+
+CREATE OR REPLACE FILE FORMAT CSV
+TYPE = CSV,
+FIELD_DELIMITER = ","
+SKIP_HEADER = 1;
+
+SHOW STAGES;
+LIST @customer_ext_stage;
+
+
+CREATE OR REPLACE PIPE customer_s3_pipe
+  auto_ingest = true
+  AS
+  COPY INTO customer_raw
+  FROM @customer_ext_stage
+  FILE_FORMAT = CSV
+  ;
+
+show pipes;
+
+select SYSTEM$PIPE_STATUS('customer_s3_pipe');
+
+SELECT count(*) FROM customer_raw limit 10;
+
+TRUNCATE  customer_raw;
