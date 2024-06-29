@@ -29,7 +29,7 @@ This README provides a comprehensive guide to setting up a real-time data stream
    - Configure instance details (number of instances, VPC settings, etc.).
    - Add storage (minimum 20 GB recommended).
    - Add tags (optional).
-   - Configure security group to allow inbound SSH (port 22) and any other required ports (e.g., 8080 for NiFi).
+   - Configure security group to allow inbound SSH (port 22) and any other required ports (e.g., 2080 for NiFi).
    - Review and launch.
 
 4. **Connect to EC2 instance** using SSH:
@@ -70,11 +70,11 @@ This README provides a comprehensive guide to setting up a real-time data stream
 
 2. **Run the NiFi container**:
    ```sh
-   docker run -d -p 8080:8080 --name nifi apache/nifi
+   docker run -d -p 2080:2080 --name nifi apache/nifi
    ```
 
 3. **Access NiFi Web UI**:
-   - Open a web browser and navigate to `http://your-ec2-public-dns:8080/nifi`.
+   - Open a web browser and navigate to `http://your-ec2-public-dns:2080/nifi`.
 
 ### 4. Configure Apache NiFi for Data Ingestion
 
@@ -121,7 +121,7 @@ This README provides a comprehensive guide to setting up a real-time data stream
 
 ## Troubleshooting
 
-- **NiFi UI not accessible**: Check security group settings and ensure port 8080 is open.
+- **NiFi UI not accessible**: Check security group settings and ensure port 2080 is open.
 - **Snowflake connection issues**: Verify credentials and network configurations.
 
 ## Conclusion
